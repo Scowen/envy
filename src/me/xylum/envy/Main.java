@@ -1,4 +1,4 @@
-package me.xylum.ranks;
+package me.xylum.envy;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
