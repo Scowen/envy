@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/envy-ranks.iml" filepath="$PROJECT_DIR$/envy-ranks.iml" />
+      <module fileurl="file://$PROJECT_DIR$/envy.iml" filepath="$PROJECT_DIR$/envy.iml" />
     </modules>
   </component>
 </project>
