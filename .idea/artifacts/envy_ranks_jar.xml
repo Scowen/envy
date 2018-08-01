@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="envy-ranks:jar">
-    <output-path>E:/Documents/Spigot Server/plugins</output-path>
-    <root id="archive" name="envy-ranks.jar">
-      <element id="module-output" name="envy" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/spigot-api-1.13-R0.1-20180722.093907-4-shaded.jar" path-in-jar="/" />
-    </root>
-  </artifact>
-</component>

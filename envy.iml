@@ -10,7 +10,25 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/spigot-api-1.13-R0.1-20180722.093907-4-shaded.jar!/" />
+          <root url="jar://$MODULE_DIR$/../spigot-resources/spigot-api-1.13-R0.1-20180722.093907-4-shaded.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../spigot-resources/mysql-connector-java-5.1.46/mysql-connector-java-5.1.46.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../spigot-resources/MySQL.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

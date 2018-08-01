@@ -1,5 +1,9 @@
-name: Envy-Ranks
+name: Envy
 version: 0.1
 author: Xylum
 main: me.xylum.envy.Main
 api-version: 1.13
+commands:
+  envy:
+    description: Envy Craft's custom plugin.
+    usage: /envy
