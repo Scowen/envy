@@ -4,6 +4,8 @@ import me.vagdedes.mysql.database.SQL;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
@@ -18,10 +20,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 import static org.bukkit.Bukkit.*;
@@ -29,14 +28,14 @@ import static org.bukkit.Bukkit.*;
 public class DeathJail implements Listener {
     static final int DEFAULT_DEATH_TIME = 10;
 
-    private HashMap<String, Jail> jails = new HashMap<>();
-    private HashMap<String, JailedPlayer> jailedPlayers = new HashMap<>();
-    private FileConfiguration config;
+    public HashMap<String, Jail> jails;
+    public HashMap<String, JailedPlayer> jailedPlayers;
 
     ConsoleCommandSender console = getServer().getConsoleSender();
 
-    DeathJail(FileConfiguration config) {
-        this.config = config;
+    DeathJail() {
+        jails = new HashMap<>();
+        jailedPlayers = new HashMap<>();
 
         if (MySQL.isConnected()) {
             // Create tables that don't exist.
@@ -74,8 +73,9 @@ public class DeathJail implements Listener {
                             result.getString("world"),
                             result.getDouble("x"),
                             result.getDouble("y"),
-                            result.getDouble("z"));
-
+                            result.getDouble("z"),
+                            false
+                    );
                     jails.put(jail.name, jail);
                 }
             } catch (SQLException sqlExc) {
@@ -128,7 +128,7 @@ public class DeathJail implements Listener {
                     true
             );
 
-            player.sendMessage(Main.colours(config.getString("messages.death")));
+            player.sendMessage(Main.colours(Main.sConfig.getString("messages.death")));
 
             jailedPlayers.put(jailedPlayer.playerUuid, jailedPlayer);
         }
@@ -143,72 +143,79 @@ public class DeathJail implements Listener {
 
     }
 
-    private class Jail {
-        String name;
-        String world;
-        double x;
-        double y;
-        double z;
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
 
-        Jail(String name, String world, double x, double y, double z) {
-            this.name = name;
-            this.world = world;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-    }
+            if (args[1].equalsIgnoreCase("create")) {
+                if (sender.hasPermission("envy.jail.create")) {
+                    if (args.length == 2) {
+                        String jailName = args[1];
 
-    private class JailedPlayer {
-        String playerName;
-        String playerUuid;
-        String killerName;
-        String killerUuid;
-        double created;
-        double expires;
+                        if (jails.containsKey(jailName))
+                            jails.get(jailName).delete();
 
-        JailedPlayer(String playerName, String playerUuid, String killerName, String killerUuid, double created, double expires, boolean insert) {
-            this.playerName = playerName;
-            this.playerUuid = playerUuid;
-            this.killerName = killerName;
-            this.killerUuid = killerUuid;
-            this.created = created;
-            this.expires = expires;
-
-            double delayMilli = (expires - created) * 1000;
-
-            class RemovePlayerFromJail extends TimerTask {
-                public void run() {
-                    jailedPlayers.remove(playerUuid);
-
-                    // Try get the player by their UUID:
-                    Player player = Bukkit.getPlayer(playerUuid);
-                    // Otherwise try their name:
-                    if (player == null) player = Bukkit.getPlayer(playerName);
-                    // Teleport the player to spawn.
-                    if (player != null) {
-                        player.sendMessage(Main.colours(config.getString("messages.unjail")));
-                        player.performCommand("spawn");
+                        Jail jail = new Jail(
+                                jailName,
+                                player.getWorld().getName(),
+                                player.getLocation().getX(),
+                                player.getLocation().getY(),
+                                player.getLocation().getZ(),
+                                true
+                        );
+                        jails.put(jail.name, jail);
+                        sender.sendMessage(Main.colours(Main.FTAG + "Jail &6" + jailName + "&F set &Asuccessfully&f."));
+                    } else {
+                        sender.sendMessage(Main.colours(Main.FTAG + "Invalid Syntax: &7/envy jail create <name>"));
                     }
-
-                    getLogger().log(Level.INFO, Main.TAG + playerName + " has been unjailed");
+                } else {
+                    sender.sendMessage(Main.colours(Main.FTAG + "&cYou do not have the permission envy.jail.create"));
                 }
+                return true;
             }
-            Timer timer = new Timer();
-            timer.schedule(new RemovePlayerFromJail(), (long) delayMilli);
 
-            if (insert) {
-                SQL.insertData("player_name, player_uuid, killer_name, killer_uuid, created, expires",
-                        "'" + playerName + "'," +
-                                "'" + playerUuid + "'," +
-                                "'" + killerName + "'," +
-                                "'" + killerUuid + "'," +
-                                created + "," +
-                                expires,
-                        "envy_player_jails"
-                );
+            if (args[1].equalsIgnoreCase("delete")) {
+                if (sender.hasPermission("envy.jail.delete")) {
+                    if (args.length == 2) {
+                        String jailName = args[1];
+
+                        if (jails.containsKey(jailName)) {
+                            jails.get(jailName).delete();
+
+                            sender.sendMessage(Main.colours(Main.FTAG + "Jail &6" + jailName + "&F deleted &Asuccessfully&f."));
+                        } else {
+                            sender.sendMessage(Main.colours(Main.FTAG + "Jail &6" + jailName + "&c does not exist&f."));
+                        }
+                    } else {
+                        sender.sendMessage(Main.colours(Main.FTAG + "Invalid Syntax: &7/envy jail delete <name>"));
+                    }
+                } else {
+                    sender.sendMessage(Main.colours(Main.FTAG + "&cYou do not have the permission envy.jail.delete"));
+                }
+                return true;
             }
+
+            if (args[1].equalsIgnoreCase("list")) {
+                if (sender.hasPermission("envy.jail.list")) {
+                    for (Map.Entry<String, Jail> entry : jails.entrySet()) {
+                        String key = entry.getKey();
+                        Object value = entry.getValue();
+                        // ...
+                    }
+                } else {
+                    sender.sendMessage(Main.colours(Main.FTAG + "&cYou do not have the permission envy.jail.delete"));
+                }
+                return true;
+            }
+
+            sender.sendMessage(Main.colours(Main.FTAG + "&FAvailable &6Jail&F commands:"));
+            sender.sendMessage(Main.colours("&4-&F create <name> &7- Creates jail with specified name."));
+            sender.sendMessage(Main.colours("&4-&F delete <name> &7- Deleted jail with specified name."));
+            sender.sendMessage(Main.colours("&4-&F list &7- Lists all jails."));
+            sender.sendMessage(Main.colours("&4-&F player <player> <seconds> <jail name> &7- Jails player."));
+            sender.sendMessage(Main.colours("&4-&F free <player> &7- Un-jails a player."));
         }
+        return true;
     }
 }
 

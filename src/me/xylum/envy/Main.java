@@ -2,45 +2,46 @@ package me.xylum.envy;
 
 import me.vagdedes.mysql.basic.Config;
 import me.vagdedes.mysql.database.MySQL;
-import me.vagdedes.mysql.database.SQL;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Main extends JavaPlugin implements CommandExecutor {
-    public static final String TAG = "[Envy] ";
-    public static final String FTAG = "&2[&4Envy&2]&F ";
+public class Main extends JavaPlugin {
+    static final String TAG = "[Envy] ";
+    static final String FTAG = "&2[&4Envy&2]&F ";
 
-    FileConfiguration config = getConfig();
-    private DeathJail deathJail;
+    static FileConfiguration sConfig;
+    static DeathJail sDeathJail;
 
     @Override
     public void onEnable() {
-        config.addDefault("mysql.host", "localhost");
-        config.addDefault("mysql.username", "root");
-        config.addDefault("mysql.password", "cjdann42");
-        config.addDefault("mysql.database", "envycraft");
+        sConfig = getConfig();
 
-        config.addDefault("messages.death", "&6You have been killed! Jail time remaining: {time_remaining}");
-        config.addDefault("messages.unjail", "&6You have been unjailed!");
-        config.options().copyDefaults(true);
+        sConfig.addDefault("mysql.host", "localhost");
+        sConfig.addDefault("mysql.port", "3306");
+        sConfig.addDefault("mysql.username", "root");
+        sConfig.addDefault("mysql.password", "cjdann42");
+        sConfig.addDefault("mysql.database", "envycraft");
+
+        sConfig.addDefault("messages.death", "&6You have been killed! Jail time remaining: {time_remaining}");
+        sConfig.addDefault("messages.unjail", "&6You have been unjailed!");
+        sConfig.options().copyDefaults(true);
         saveConfig();
 
-        Config.setHost(config.getString("mysql.host"));
-        Config.setUser(config.getString("mysql.username"));
-        Config.setPassword(config.getString("mysql.password"));
-        Config.setDatabase(config.getString("mysql.database"));
-        Config.setPort("3306");
+        Config.setHost(sConfig.getString("mysql.host"));
+        Config.setUser(sConfig.getString("mysql.username"));
+        Config.setPassword(sConfig.getString("mysql.password"));
+        Config.setDatabase(sConfig.getString("mysql.database"));
+        Config.setPort(sConfig.getString("mysql.port"));
 
         if (!MySQL.isConnected())
             MySQL.connect();
 
-        deathJail = new DeathJail(config);
-        getServer().getPluginManager().registerEvents(deathJail, this);
+        sDeathJail = new DeathJail();
+        getServer().getPluginManager().registerEvents(sDeathJail, this);
     }
 
     @Override
@@ -49,7 +50,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
             MySQL.disconnect();
     }
 
-    public static String colours(String string) {
+    static String colours(String string) {
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 
@@ -57,10 +58,12 @@ public class Main extends JavaPlugin implements CommandExecutor {
         if (cmd.getName().equalsIgnoreCase("envy")) {
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("reload")) {
-                    if (sender instanceof Player && sender.hasPermission("envy.reload")) {
-                        this.reloadConfig();
-                        sender.sendMessage(colours(FTAG + "Config reloaded."));
-                        return true;
+                    if (sender instanceof Player) {
+                        if (sender.hasPermission("envy.reload")) {
+                            this.reloadConfig();
+                            sender.sendMessage(colours(FTAG + "Config reloaded."));
+                            return true;
+                        }
                     } else {
                         this.reloadConfig();
                         sender.sendMessage(TAG + "Config reloaded.");
@@ -68,11 +71,17 @@ public class Main extends JavaPlugin implements CommandExecutor {
                     }
                     return false;
                 }
+
+                if (args[0].equalsIgnoreCase("jail"))
+                    sDeathJail.onCommand(sender, cmd, commandLabel, args);
+            } else {
                 if (sender instanceof Player) {
-                    sender.sendMessage(colours(FTAG + "&4Available commands:"));
+                    sender.sendMessage(colours(FTAG + "&FAvailable commands:"));
+                    sender.sendMessage(colours("&4-&F reload &7- Reloads the config."));
+                    sender.sendMessage(colours("&4-&F jail &7- View the jail commands."));
                 }
+                return true;
             }
-            return false;
         }
         return false;
     }
