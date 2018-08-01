@@ -66,6 +66,10 @@ public class Main extends JavaPlugin implements CommandExecutor {
                         sender.sendMessage(TAG + "Config reloaded.");
                         return true;
                     }
+                    return false;
+                }
+                if (sender instanceof Player) {
+                    sender.sendMessage(colours(FTAG + "&4Available commands:"));
                 }
             }
             return false;
