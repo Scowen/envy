@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="envy_luke_work:jar">
+    <output-path>E:/Documents/Spigot Server/plugins</output-path>
+    <root id="archive" name="envy.jar">
+      <element id="module-output" name="envy" />
+    </root>
+  </artifact>
+</component>

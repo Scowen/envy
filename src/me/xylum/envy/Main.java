@@ -2,19 +2,28 @@ package me.xylum.envy;
 
 import me.vagdedes.mysql.basic.Config;
 import me.vagdedes.mysql.database.MySQL;
-import org.bukkit.ChatColor;
+import net.milkbowl.vault.permission.Permission;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Main extends JavaPlugin {
+public class Main extends JavaPlugin implements Listener {
     static final String TAG = "[Envy] ";
     static final String FTAG = "&2[&4Envy&2]&F ";
 
     static FileConfiguration sConfig;
     static DeathJail sDeathJail;
+    static Permission perms = null;
+    ConsoleCommandSender console = getServer().getConsoleSender();
 
     @Override
     public void onEnable() {
@@ -26,7 +35,7 @@ public class Main extends JavaPlugin {
         sConfig.addDefault("mysql.password", "cjdann42");
         sConfig.addDefault("mysql.database", "envycraft");
 
-        sConfig.addDefault("messages.death", "&6You have been killed! Jail time remaining: {time_remaining}");
+        sConfig.addDefault("messages.jailed", "&6You were killed by {killer_name}! Jail time remaining: {seconds_left}");
         sConfig.addDefault("messages.unjail", "&6You have been unjailed!");
         sConfig.options().copyDefaults(true);
         saveConfig();
@@ -40,8 +49,23 @@ public class Main extends JavaPlugin {
         if (!MySQL.isConnected())
             MySQL.connect();
 
+        setupPermissions();
+
         sDeathJail = new DeathJail();
+        Bukkit.getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(sDeathJail, this);
+
+        Jail.load();
+        JailTime.load();
+        JailedPlayer.load();
+        BlockedCommand.load();
+
+        console.sendMessage(TAG + "EEEE N   N V     V Y   Y ");
+        console.sendMessage(TAG + "E    NN  N V     V  Y Y  ");
+        console.sendMessage(TAG + "EEE  N N N  V   V    Y   ");
+        console.sendMessage(TAG + "E    N  NN   V V     Y   ");
+        console.sendMessage(TAG + "EEEE N   N    V      Y   ");
+        console.sendMessage(TAG + "Envy loaded successfully");
     }
 
     @Override
@@ -50,18 +74,38 @@ public class Main extends JavaPlugin {
             MySQL.disconnect();
     }
 
-    static String colours(String string) {
-        return ChatColor.translateAlternateColorCodes('&', string);
+    private boolean setupPermissions()
+    {
+        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        if (permissionProvider != null) {
+            perms = permissionProvider.getProvider();
+        }
+        return (perms != null);
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCommand(PlayerCommandPreprocessEvent e){
+        Player p = e.getPlayer();
+
+        if (sDeathJail.jailedPlayers.containsKey(p.getUniqueId().toString())) {
+            for (String command : sDeathJail.blockedCommands) {
+                if (e.getMessage().startsWith(command)) {
+                    p.sendMessage("&cYou may not use this command while in jail!");
+                    e.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (cmd.getName().equalsIgnoreCase("envy")) {
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("reload")) {
                     if (sender instanceof Player) {
-                        if (sender.hasPermission("envy.reload")) {
+                        if (Main.perms.has((Player) sender, "envy.admin")) {
                             this.reloadConfig();
-                            sender.sendMessage(colours(FTAG + "Config reloaded."));
+                            sender.sendMessage(Utils.colours(FTAG + "Config reloaded."));
                             return true;
                         }
                     } else {
@@ -76,13 +120,13 @@ public class Main extends JavaPlugin {
                     sDeathJail.onCommand(sender, cmd, commandLabel, args);
             } else {
                 if (sender instanceof Player) {
-                    sender.sendMessage(colours(FTAG + "&FAvailable commands:"));
-                    sender.sendMessage(colours("&4-&F reload &7- Reloads the config."));
-                    sender.sendMessage(colours("&4-&F jail &7- View the jail commands."));
+                    sender.sendMessage(Utils.colours(FTAG + "&FAvailable commands:"));
+                    sender.sendMessage(Utils.colours("&4-&F reload &7- Reloads the config."));
+                    sender.sendMessage(Utils.colours("&4-&F jail &7- View the jail commands."));
                 }
                 return true;
             }
         }
-        return false;
+        return true;
     }
 }

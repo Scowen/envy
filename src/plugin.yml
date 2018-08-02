@@ -7,3 +7,22 @@ commands:
   envy:
     description: Envy Craft's custom plugin.
     usage: /envy
+permissions:
+  envy.jail.create:
+    description: Create a jail
+    default: false
+  envy.jail.delete:
+    description: Delete a jail
+    default: false
+  envy.jail.list:
+    description: List all jails
+    default: false
+  envy.jail.commands.block:
+    description: Blocks a command while in jail
+    default: false
+  envy.jail.commands.unblock:
+    description: Un-blocks a command while in jail
+    default: false
+  envy.jail.commands.list:
+    description: Lists all blocked commands
+    default: false
