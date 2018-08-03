@@ -8,6 +8,21 @@ commands:
     description: Envy Craft's custom plugin.
     usage: /envy
 permissions:
+  envy.*:
+    description: Access to all envy commands
+    children:
+      envy.jail.*: true
+      envy.admin: true
+  envy.jail.*:
+    description: Access to all envy jail commands
+    children:
+      envy.jail.create: true
+      envy.jail.delete: true
+      envy.jail.list: true
+      envy.jail.commands.block: true
+      envy.jail.commands.unblock: true
+      envy.jail.commands.list: true
+      envy.jail.group: true
   envy.jail.create:
     description: Create a jail
     default: false
@@ -25,4 +40,10 @@ permissions:
     default: false
   envy.jail.commands.list:
     description: Lists all blocked commands
+    default: false
+  envy.jail.group:
+    description: Assign group to a jail
+    default: false
+  envy.admin:
+    description: Receives admin messages
     default: false

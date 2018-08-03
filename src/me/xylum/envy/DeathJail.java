@@ -76,7 +76,7 @@ public class DeathJail implements Listener {
         Player player = e.getEntity().getPlayer();
         Player killer = e.getEntity().getKiller();
 
-        if (player != null) {// && killer != null) {
+        if (player != null && killer != null) {
             long unixTime = System.currentTimeMillis() / 1000L;
 
             // Get the time that the user needs to be jailed for.
@@ -103,8 +103,8 @@ public class DeathJail implements Listener {
                 JailedPlayer jailedPlayer = new JailedPlayer(
                         player.getName(),
                         player.getUniqueId().toString(),
-                        "Killer", // killer.getName(),
-                        "killer_uuid", // killer.getUniqueId().toString(),
+                        killer.getName(),
+                        killer.getUniqueId().toString(),
                         jailTime.jail,
                         unixTime,
                         expiresTime,
@@ -149,19 +149,19 @@ public class DeathJail implements Listener {
             Player player = (Player) sender;
 
             if (args.length >= 2 && args[1].equalsIgnoreCase("create")) {
-                if (!Main.perms.has(player, "envy.jail.create")) {
+                if (!Main.perms.has(player, "envy.jail.create") && !player.isOp()) {
                     sender.sendMessage(Utils.colours(Main.FTAG + "&cYou do not have the permission envy.jail.create"));
                     return true;
                 }
 
                 if (args.length != 3) {
-                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid Syntax: &7/envy jail create <name>"));
+                    sender.sendMessage(Utils.colours(Main.FTAG + "&7/envy jail create <name>"));
                     return true;
                 }
 
                 String jailName = args[2];
                 if (jailName.length() < 3) {
-                    sender.sendMessage(Utils.colours(Main.FTAG + "Jail name is too short (min 3 char)"));
+                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid jail name (min 3 char)"));
                     return true;
                 }
 
@@ -186,19 +186,19 @@ public class DeathJail implements Listener {
             }
 
             if (args.length >= 2 && args[1].equalsIgnoreCase("delete")) {
-                if (!Main.perms.has(player, "envy.jail.delete")) {
+                if (!Main.perms.has(player, "envy.jail.delete") && !player.isOp()) {
                     sender.sendMessage(Utils.colours(Main.FTAG + "&cYou do not have the permission envy.jail.delete"));
                     return true;
                 }
 
                 if (args.length != 3) {
-                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid Syntax: &7/envy jail delete <name>"));
+                    sender.sendMessage(Utils.colours(Main.FTAG + "&7/envy jail delete <name>"));
                     return true;
                 }
 
                 String jailName = args[2];
                 if (jailName.length() < 1) {
-                    sender.sendMessage(Utils.colours(Main.FTAG + "You must include the name of the jail"));
+                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid jail name"));
                     return true;
                 }
 
@@ -214,8 +214,8 @@ public class DeathJail implements Listener {
             }
 
             if (args.length >= 2 && args[1].equalsIgnoreCase("list")) {
-                if (!Main.perms.has(player, "envy.jail.list")) {
-                    sender.sendMessage(Utils.colours(Main.FTAG + "&cYou do not have the permission envy.jail.delete"));
+                if (!Main.perms.has(player, "envy.jail.list") && !player.isOp()) {
+                    sender.sendMessage(Utils.colours(Main.FTAG + "&cYou do not have the permission envy.jail.list"));
                     return true;
                 }
 
@@ -231,19 +231,19 @@ public class DeathJail implements Listener {
             }
 
             if (args.length >= 2 && args[1].equalsIgnoreCase("block")) {
-                if (!Main.perms.has(player, "envy.jail.commands.block")) {
+                if (!Main.perms.has(player, "envy.jail.commands.block") && !player.isOp()) {
                     sender.sendMessage(Utils.colours(Main.FTAG + "&cYou do not have the permission envy.jail.commands.block"));
                     return true;
                 }
 
                 if (args.length != 3) {
-                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid Syntax: &7/envy jail block <command>"));
+                    sender.sendMessage(Utils.colours(Main.FTAG + "&7/envy jail block <command>"));
                     return true;
                 }
 
                 String command = args[2];
                 if (command.length() < 1) {
-                    sender.sendMessage(Utils.colours(Main.FTAG + "You must include the command"));
+                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid command"));
                     return true;
                 }
 
@@ -255,24 +255,24 @@ public class DeathJail implements Listener {
                 blockedCommands.add(command);
                 BlockedCommand.create(command);
 
-                sender.sendMessage(Utils.colours(Main.FTAG + "Command &6" + command + "&F un-blocked &Asuccessfully&f."));
+                sender.sendMessage(Utils.colours(Main.FTAG + "Command &6" + command + "&F blocked &Asuccessfully&f."));
                 return true;
             }
 
             if (args.length >= 2 && args[1].equalsIgnoreCase("unblock")) {
-                if (!Main.perms.has(player, "envy.jail.commands.unblock")) {
+                if (!Main.perms.has(player, "envy.jail.commands.unblock") && !player.isOp()) {
                     sender.sendMessage(Utils.colours(Main.FTAG + "&cYou do not have the permission envy.jail.commands.unblock"));
                     return true;
                 }
 
                 if (args.length != 3) {
-                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid Syntax: &7/envy jail unblock <command>"));
+                    sender.sendMessage(Utils.colours(Main.FTAG + "&7/envy jail unblock <command>"));
                     return true;
                 }
 
                 String command = args[2];
                 if (command.length() < 1) {
-                    sender.sendMessage(Utils.colours(Main.FTAG + "You must include the command"));
+                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid command"));
                     return true;
                 }
 
@@ -289,7 +289,7 @@ public class DeathJail implements Listener {
             }
 
             if (args.length >= 2 && args[1].equalsIgnoreCase("commands")) {
-                if (!Main.perms.has(player, "envy.jail.commands.list")) {
+                if (!Main.perms.has(player, "envy.jail.commands.list") && !player.isOp()) {
                     sender.sendMessage(Utils.colours(Main.FTAG + "&cYou do not have the permission envy.jail.commands.list"));
                     return true;
                 }
@@ -301,11 +301,65 @@ public class DeathJail implements Listener {
                 return true;
             }
 
+            if (args.length >= 2 && args[1].equalsIgnoreCase("group")) {
+                if (!Main.perms.has(player, "envy.jail.group") && !player.isOp()) {
+                    sender.sendMessage(Utils.colours(Main.FTAG + "&cYou do not have the permission envy.jail.group"));
+                    return true;
+                }
+
+                if (args.length != 5) {
+                    sender.sendMessage(Utils.colours(Main.FTAG + "&7/envy jail group <group> <jail> <seconds>"));
+                    return true;
+                }
+
+                String groupName = args[2];
+                if (groupName.length() < 1) {
+                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid group name"));
+                    return true;
+                }
+                groupName = groupName.toLowerCase();
+
+                String jailName = args[3];
+                if (jailName.length() < 1) {
+                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid jail name"));
+                    return true;
+                }
+
+                String secondsString = args[4];
+                int seconds = Integer.parseInt(secondsString);
+                if (secondsString.length() < 1 || seconds < 0) {
+                    sender.sendMessage(Utils.colours(Main.FTAG + "Invalid seconds"));
+                    return true;
+                }
+
+                if (!jails.containsKey(jailName)) {
+                    sender.sendMessage(Utils.colours(Main.FTAG + "Jail &c" + jailName + "&f does not exist"));
+                    return true;
+                }
+
+                if (jailTimes.containsKey(groupName)) {
+                    jailTimes.get(groupName).delete();
+                }
+
+                JailTime jailTime = new JailTime(
+                        groupName,
+                        jailName,
+                        seconds,
+                        true
+                );
+
+                jailTimes.put(jailTime.group, jailTime);
+
+                sender.sendMessage(Utils.colours(Main.FTAG + "Group &6" + jailTime.group + "&F assigned to " +
+                        "&A" + jailTime.jail.name + "&f jail for &7" + jailTime.seconds + "&f seconds"));
+                return true;
+            }
+
             sender.sendMessage(Utils.colours(Main.FTAG + "&FAvailable &6Jail&F commands:"));
             sender.sendMessage(Utils.colours("&4-&F create <name> &7- Creates jail with specified name."));
             sender.sendMessage(Utils.colours("&4-&F delete <name> &7- Deleted jail with specified name."));
             sender.sendMessage(Utils.colours("&4-&F list &7- Lists all jails."));
-            //sender.sendMessage(Utils.colours("&4-&F group <jail> <seconds> &7- Assigns group to jail."));
+            sender.sendMessage(Utils.colours("&4-&F group <group> <jail> <seconds> &7- Assigns group to jail."));
             sender.sendMessage(Utils.colours("&4-&F block <command> &7- Blocks command while in jail."));
             sender.sendMessage(Utils.colours("&4-&F unblock <command> &7- Unblocks the command."));
             sender.sendMessage(Utils.colours("&4-&F commands &7- Lists all blocked commands."));

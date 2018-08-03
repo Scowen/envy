@@ -24,7 +24,7 @@ public class JailTime {
 
         Jail jail = Main.sDeathJail.jails.get(jailName);
 
-        this.group = group;
+        this.group = group.toLowerCase();
         this.jail = jail;
         this.seconds = seconds;
 
@@ -32,7 +32,7 @@ public class JailTime {
     }
 
     public JailTime(String group, Jail jail, int seconds, boolean insert) {
-        this.group = group;
+        this.group = group.toLowerCase();
         this.jail = jail;
         this.seconds = seconds;
 
@@ -62,12 +62,17 @@ public class JailTime {
 
     public void create(boolean insert) {
         if (insert) {
-            SQL.insertData("group, jail, seconds",
-                    "'" + group + "'," +
-                            "'" + jail.name + "'," +
-                            seconds,
+            SQL.insertData("`group`, `jail`, `seconds`",
+                    "'" + group + "', " +
+                            "'" + jail.name + "', " +
+                            "'" + seconds + "'",
                     TABLE
             );
         }
+    }
+
+    public void delete() {
+        SQL.deleteData("group", "=",  group, TABLE);
+        Main.sDeathJail.jailTimes.remove(group);
     }
 }

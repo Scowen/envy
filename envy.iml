@@ -4,13 +4,14 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/resources" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../spigot-resources/spigot-api-1.13-R0.1-20180722.093907-4-shaded.jar!/" />
+          <root url="jar://$MODULE_DIR$/resources/mysql-connector-java-5.1.46.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -19,7 +20,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../spigot-resources/mysql-connector-java-5.1.46/mysql-connector-java-5.1.46.jar!/" />
+          <root url="jar://$MODULE_DIR$/resources/MySQL.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -28,34 +29,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../spigot-resources/MySQL.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../envy-resources/mysql-connector-java-5.1.46.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../envy-resources/MySQL.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../envy-resources/spigot-api-1.13-R0.1-20180722.093907-4-shaded.jar!/" />
+          <root url="jar://$MODULE_DIR$/resources/Vault-1.6.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -64,10 +38,12 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../spigot-resources/Vault-1.6.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/resources/spigot-1.12.2-R0.1-SNAPSHOT-b1648.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/resources/spigot-1.12.2-R0.1-SNAPSHOT-b1648.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>
